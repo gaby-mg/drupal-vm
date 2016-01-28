@@ -22,10 +22,9 @@ vagrant_public_ip: ""
 vagrant_synced_folders:
   # The first synced folder will be used for the default Drupal installation, if
   # build_makefile: is 'true'.
-  - local_path: ~/Sites/drupalvm
-    destination: /var/www/drupalvm
+  - local_path: ~/Code/worldvision/docroot
+    destination: /var/www/worldvision
     type: nfs
-    create: true
 
 # Memory and CPU to use for this VM.
 vagrant_memory: 1024
@@ -36,12 +35,12 @@ drupalvm_webserver: apache
 
 # Set this to false if you are using a different site deployment strategy and
 # would like to configure 'vagrant_synced_folders' and 'apache_vhosts' manually.
-build_makefile: true
+build_makefile: false
 drush_makefile_path: /vagrant/drupal.make.yml
 
 # Set this to false if you don't need to install drupal (using the drupal_*
 # settings below), but instead copy down a database (e.g. using drush sql-sync).
-install_site: true
+install_site: false
 
 # Settings for building a Drupal site from a makefile (if 'build_makefile:'
 # is 'true').
@@ -77,6 +76,11 @@ configure_local_drush_aliases: true
 # multisite deployments, you can point multiple servernames at one documentroot.
 # View the geerlingguy.apache Ansible Role README for more options.
 apache_vhosts:
+  - servername: "local.worldvision.es"
+    documentroot: "/var/www/worldvision"
+    extra_parameters: |
+          ProxyPassMatch ^/(.*\.php(/.*)?)$ "fcgi://127.0.0.1:9000{{ drupal_core_path }}"
+
   - servername: "{{ drupal_domain }}"
     documentroot: "{{ drupal_core_path }}"
     extra_parameters: |
@@ -131,12 +135,19 @@ mysql_databases:
   - name: "{{ drupal_mysql_database }}"
     encoding: utf8
     collation: utf8_general_ci
+  - name: "leproducer_wv"
+    encoding: utf8
+    collation: utf8_general_ci
 
 mysql_users:
   - name: "{{ drupal_mysql_user }}"
     host: "%"
     password: "{{ drupal_mysql_password }}"
     priv: "{{ drupal_mysql_database }}.*:ALL"
+  - name: "worldvision"
+    host: "%"
+    password: "cN4g7bXVl459OEN"
+    priv: "leproducer_wv.*:ALL"
 
 # Comment out any extra utilities you don't want to install. If you don't want
 # to install *any* extras, make set this value to an empty set, e.g. `[]`.
