@@ -24,7 +24,7 @@ vagrant_synced_folders:
   # build_makefile: is 'true'.
   - local_path: ~/Code/worldvision/docroot
     destination: /var/www/worldvision
-    type: nfs
+    type: rsync
 
 # Memory and CPU to use for this VM.
 vagrant_memory: 1024
